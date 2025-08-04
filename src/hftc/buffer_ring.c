@@ -1,7 +1,5 @@
+#include <stdint.h>
 #include "buffer_ring.h"
-#include <stdatomic.h>
-#include <stdlib.h>
-
 void ring_init(ring_buffer_t *rb)
 {
     atomic_store(&rb->head, 0);
@@ -10,10 +8,14 @@ void ring_init(ring_buffer_t *rb)
 
 int ring_push(ring_buffer_t *rb, void *item)
 {
-    uint64_t tail = atomic_load(&rb->tail);
+    uint64_t tail = (uint64_t)atomic_load(&rb->tail);
+    uint64_t head = (uint64_t)atomic_load(&rb->head);
     uint64_t next = tail + 1;
-    if ((next - atomic_load(&rb->head)) > RING_SIZE)
-        return -1; // full
+
+    /* full when next - head > RING_SIZE */
+    if ((next - head) > RING_SIZE)
+        return -1;
+
     rb->entries[tail & (RING_SIZE - 1)] = item;
     atomic_store(&rb->tail, next);
     return 0;
@@ -21,9 +23,13 @@ int ring_push(ring_buffer_t *rb, void *item)
 
 void *ring_pop(ring_buffer_t *rb)
 {
-    uint64_t head = atomic_load(&rb->head);
-    if (head == atomic_load(&rb->tail))
-        return NULL; // empty
+    uint64_t head = (uint64_t)atomic_load(&rb->head);
+    uint64_t tail = (uint64_t)atomic_load(&rb->tail);
+
+    /* empty when head == tail */
+    if (head == tail)
+        return NULL;
+
     void *item = rb->entries[head & (RING_SIZE - 1)];
     atomic_store(&rb->head, head + 1);
     return item;
