@@ -4,9 +4,13 @@ setup.cfg
 setup.py
 src/hftc/_hftcmodule.c
 src/hftc/buffer_ring.c
+src/hftc/market_feed.c
+src/hftc/order_encoder.c
 src/hftc/__init__.py
 src/hftc/_hftcmodule.c
 src/hftc/buffer_ring.c
+src/hftc/market_feed.c
+src/hftc/order_encoder.c
 src/hftc.egg-info/PKG-INFO
 src/hftc.egg-info/SOURCES.txt
 src/hftc.egg-info/dependency_links.txt

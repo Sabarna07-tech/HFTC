@@ -1,25 +1,19 @@
-# setup.py
-import os
 from setuptools import setup, Extension
+import os
 
-extra_compile_args = []
-# on *nix you can keep -O3 etc.
-if os.name != 'nt':
-    extra_compile_args = ['-O3', '-march=native']
-else:
-    # MSVC: optimization flag is /O2
-    extra_compile_args = ['/O2']
+extra_args = ['/O2'] if os.name=='nt' else ['-O3','-march=native']
 
 ext_modules = [
     Extension(
         'hftc._hftcmodule',
         sources=[
             'src/hftc/_hftcmodule.c',
-            'src/hftc/buffer_ring.c',     # ← include your ring-buffer impl
-            # add market_feed.c here when ready
+            'src/hftc/buffer_ring.c',
+            'src/hftc/market_feed.c',
+            "src/hftc/order_encoder.c",# ← include it here
         ],
-        include_dirs=['src/hftc'],        # so it can find buffer_ring.h
-        extra_compile_args=extra_compile_args,
+        include_dirs=['src/hftc'],
+        extra_compile_args=extra_args,
     )
 ]
 
